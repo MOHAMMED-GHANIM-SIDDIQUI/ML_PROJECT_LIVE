@@ -1,27 +1,24 @@
-# -*- coding: utf-8 -*-
-"""
-Spyder Editor
-
-This is a temporary script file.
-"""
-import numpy as np
+from pathlib import Path
 import pickle
 
-# loading the saved model
-loaded_model = pickle.load(open('C:/Users/mgs18/OneDrive/Desktop/ML PROJECT/DIABETES PREDICTION/trained_model.sav', 'rb'))
+import numpy as np
 
-input_data = (5,166,72,19,175,25.8,0.587,51)
 
-# changing the input_data to numpy array
-input_data_as_numpy_array = np.asarray(input_data)
+MODEL_PATH = Path(__file__).resolve().parent / "trained_model.sav"
 
-# reshape the array as we are predicting for one instance
-input_data_reshaped = input_data_as_numpy_array.reshape(1,-1)
 
-prediction = loaded_model.predict(input_data_reshaped)
-print(prediction)
+def load_model():
+    with MODEL_PATH.open("rb") as model_file:
+        return pickle.load(model_file)
 
-if (prediction[0] == 0):
-  print('The person is not diabetic')
-else:
-  print('The person is diabetic')
+
+def predict_diabetes(input_data: tuple[float, ...]) -> str:
+    model = load_model()
+    features = np.asarray(input_data, dtype=float).reshape(1, -1)
+    prediction = model.predict(features)
+    return "The person is diabetic" if int(prediction[0]) == 1 else "The person is not diabetic"
+
+
+if __name__ == "__main__":
+    sample_input = (5, 166, 72, 19, 175, 25.8, 0.587, 51)
+    print(predict_diabetes(sample_input))
