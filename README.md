@@ -14,7 +14,7 @@ The primary runnable project is:
 DIABETES_PREDICT_webapp.py
 ```
 
-It loads the saved model artifact `trained_model.sav`, accepts patient feature inputs, and returns a diabetes-risk classification.
+It loads the saved model artifact from `models/trained_model.sav`, accepts patient feature inputs, and returns a diabetes-risk classification.
 
 ## Important Disclaimer
 
@@ -29,6 +29,8 @@ This is an educational machine-learning demo. It is not medical advice and must 
 - Added prediction error handling.
 - Added a CLI-friendly prediction script.
 - Added setup documentation, dependency file, and `.gitignore`.
+- Split reusable prediction logic into `src/diabetes_predictor`.
+- Added pytest coverage and GitHub Actions CI.
 
 ## Architecture
 
@@ -44,14 +46,24 @@ flowchart LR
 
 ```text
 ML_PROJECT_LIVE/
-|-- DIABETES_PREDICT_webapp.py
-|-- DIABETES_PREDICTION_SYSTEM.py
-|-- trained_model.sav
+|-- DIABETES_PREDICT_webapp.py       # Streamlit entrypoint
+|-- DIABETES_PREDICTION_SYSTEM.py    # CLI smoke-test entrypoint
 |-- requirements.txt
 |-- README.md
 |-- .gitignore
-|-- ML_Project_House_Price_Prediction.ipynb
-`-- ML__Project_Credit_Card_Fraud_Detection.ipynb
+|-- models/
+|   `-- trained_model.sav
+|-- notebooks/
+|   |-- house_price_prediction.ipynb
+|   `-- credit_card_fraud_detection.ipynb
+|-- src/
+|   `-- diabetes_predictor/
+|       |-- app.py                   # UI orchestration
+|       |-- config.py                # model path and feature ranges
+|       `-- predictor.py             # validation and prediction logic
+|-- tests/
+|   `-- test_predictor.py
+`-- .github/workflows/ci.yml
 ```
 
 ## Quick Start
@@ -75,6 +87,20 @@ source .venv/bin/activate
 python DIABETES_PREDICTION_SYSTEM.py
 ```
 
+## Development Workflow
+
+```bash
+set PYTHONPATH=src
+pytest -q
+python -m compileall DIABETES_PREDICT_webapp.py DIABETES_PREDICTION_SYSTEM.py src
+```
+
+On macOS/Linux:
+
+```bash
+export PYTHONPATH=src
+```
+
 ## Features Used by the Model
 
 ```text
@@ -92,7 +118,7 @@ BMI, Diabetes Pedigree Function, Age
 
 - Add model training notebook cleanup and metrics summary
 - Add model card with dataset source, score, limitations, and bias risks
-- Add tests for feature shape validation
+- Add model drift and input distribution checks
 - Replace pickle artifact with a safer model packaging format where possible
 
 ## License

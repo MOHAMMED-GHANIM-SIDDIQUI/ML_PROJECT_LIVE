@@ -1,22 +1,4 @@
-from pathlib import Path
-import pickle
-
-import numpy as np
-
-
-MODEL_PATH = Path(__file__).resolve().parent / "trained_model.sav"
-
-
-def load_model():
-    with MODEL_PATH.open("rb") as model_file:
-        return pickle.load(model_file)
-
-
-def predict_diabetes(input_data: tuple[float, ...]) -> str:
-    model = load_model()
-    features = np.asarray(input_data, dtype=float).reshape(1, -1)
-    prediction = model.predict(features)
-    return "The person is diabetic" if int(prediction[0]) == 1 else "The person is not diabetic"
+from diabetes_predictor.predictor import predict_diabetes
 
 
 if __name__ == "__main__":
